@@ -15,10 +15,13 @@ import com.assignment.WhyQ.ui.activity.DashboardActivity
 import com.assignment.WhyQ.ui.constants.TOKEN
 import com.assignment.WhyQ.ui.constants.USER_ID
 import com.assignment.WhyQ.ui.repository.AuthRepository
+import com.assignment.WhyQ.ui.util.InternetConnection
 import com.assignment.WhyQ.ui.util.PreferenceManager
 import com.assignment.WhyQ.ui.util.Resource
+import com.assignment.WhyQ.ui.util.Utils
 import com.assignment.WhyQ.ui.viewmodel.AuthViewModel
 import com.assignment.WhyQ.ui.viewmodel.AuthViewModelProviderFactory
+import com.iamageo.library.*
 
 
 class OTPFragment : Fragment(R.layout.fragment_otp) {
@@ -46,7 +49,12 @@ class OTPFragment : Fragment(R.layout.fragment_otp) {
                 binding?.otpView?.setError("Please enter 6 digit OTP.")
                 return@setOnClickListener
             }
-            authViewModel.verifyOtp(binding?.otpView?.text?.toString()!!)
+            if(InternetConnection.hasInternetConnection(requireContext())){
+                authViewModel.verifyOtp(binding?.otpView?.text?.toString()!!)
+            }
+            else{
+                Utils.showErrorDialog(requireActivity(), "No Internet Connection")
+            }
         }
     }
 
@@ -85,6 +93,7 @@ class OTPFragment : Fragment(R.layout.fragment_otp) {
                     }
                     is Resource.Error->{
                         hideLoadingState()
+                        Utils.showErrorDialog(requireActivity(), it.message!!)
                     }
                 }
             }

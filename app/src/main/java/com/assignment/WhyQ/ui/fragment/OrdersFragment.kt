@@ -16,8 +16,10 @@ import com.assignment.WhyQ.ui.adapter.OrdersAdapter
 import com.assignment.WhyQ.ui.constants.TOKEN
 import com.assignment.WhyQ.ui.constants.USER_ID
 import com.assignment.WhyQ.ui.repository.OrdersRepository
+import com.assignment.WhyQ.ui.util.InternetConnection
 import com.assignment.WhyQ.ui.util.PreferenceManager
 import com.assignment.WhyQ.ui.util.Resource
+import com.assignment.WhyQ.ui.util.Utils
 import com.assignment.WhyQ.ui.viewmodel.OrderViewModelProviderFactory
 import com.assignment.WhyQ.ui.viewmodel.OrdersViewModel
 
@@ -47,7 +49,12 @@ class OrdersFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val preferenceManager = PreferenceManager(requireContext())
-        viewModel.getOrders(preferenceManager.getToken()!!, preferenceManager.getUserId()!!)
+        if(InternetConnection.hasInternetConnection(requireContext())){
+            viewModel.getOrders(preferenceManager.getToken()!!, preferenceManager.getUserId()!!)
+        }
+        else{
+            Utils.showErrorDialog(requireActivity(), "No Internet Connection")
+        }
         setObserver()
     }
 

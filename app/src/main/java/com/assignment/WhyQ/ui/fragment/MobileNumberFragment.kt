@@ -15,10 +15,13 @@ import androidx.navigation.fragment.findNavController
 import com.assignment.WhyQ.R
 import com.assignment.WhyQ.databinding.FragmentMobileNumberBinding
 import com.assignment.WhyQ.ui.repository.AuthRepository
+import com.assignment.WhyQ.ui.util.InternetConnection
 import com.assignment.WhyQ.ui.util.Resource
+import com.assignment.WhyQ.ui.util.Utils
 import com.assignment.WhyQ.ui.viewmodel.AuthViewModel
 import com.assignment.WhyQ.ui.viewmodel.AuthViewModelProviderFactory
 import com.bumptech.glide.Glide
+import com.iamageo.library.*
 
 class MobileNumberFragment : Fragment(R.layout.fragment_mobile_number) {
     var binding : FragmentMobileNumberBinding? = null
@@ -36,12 +39,17 @@ class MobileNumberFragment : Fragment(R.layout.fragment_mobile_number) {
         }
         setObserver()
         binding?.btnSubmit?.setOnClickListener {
-            if(binding?.etMobileNumber?.text?.isEmpty() == true){
-                binding?.etMobileNumber?.error = "Please enter valid Number."
-                return@setOnClickListener
+            if(InternetConnection.hasInternetConnection(requireContext())){
+                if(binding?.etMobileNumber?.text?.isEmpty() == true){
+                    binding?.etMobileNumber?.error = "Please enter valid Number."
+                    return@setOnClickListener
+                }
+                binding?.etMobileNumber?.text?.toString()
+                    ?.let { it1 -> authViewModel.onSubmitMobileNumber(it1) }
             }
-            binding?.etMobileNumber?.text?.toString()
-                ?.let { it1 -> authViewModel.onSubmitMobileNumber(it1) }
+            else{
+                Utils.showErrorDialog(requireActivity(), "No Internet Connection")
+            }
         }
     }
 
@@ -59,6 +67,7 @@ class MobileNumberFragment : Fragment(R.layout.fragment_mobile_number) {
                     }
                     is Resource.Error->{
                         hideLoadingState()
+                        Utils.showErrorDialog(requireActivity(), it.message!!)
                     }
                 }
             }
